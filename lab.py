@@ -126,3 +126,7 @@ SIG_DFL
  sdkfhsjdf
  sdfdsf
  
+ dsfdsf
+ discard_buffers(D_FMT
+                 SMTPSenderRefused
+                 dsf)
