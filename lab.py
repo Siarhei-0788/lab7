@@ -1,132 +1,129 @@
-import tkinter as tk
-from tkinter import ttk
+from abc import ABC, abstractmethod
 
-# Задание 1
-fio_list = [
-    {
-        "FIO": "Макаров Дмитрий Андреевич",
-        "Addresses": [
-            {"town": "Гомель", "street": "Гагарина", "house": 88},
-            {"town": "Гомель", "street": "Лермонтова", "house": 12},
-        ],
-    },
-    {
-        "FIO": "Коваленко Екатерина Игоревна",
-        "Addresses": [
-            {"town": "Витебск", "street": "Победы", "house": 42},
-            {"town": "Витебск", "street": "Кирова", "house": 5},
-        ],
-    },
-    {
-        "FIO": "Сидорова Ольга Васильевна",
-        "Addresses": [
-            {"town": "Гродно", "street": "Советская", "house": 76},
-            {"town": "Гродно", "street": "Кирова", "house": 32},
-        ],
-    },
-]
+# Product: Пицца
+class Pizza:
+    def __init__(self):
+        self.ingredients = []  # Ингредиенты пиццы
+        self.sauce = None  # Соус для пиццы
+        self.cheese = None  # Сыр для пиццы
+        self.baking_time = 0  # Время выпекания
 
+    def __str__(self):
+        return f"Pizza with ingredients: {', '.join(self.ingredients)}, sauce: {self.sauce}, cheese: {self.cheese}, baked for {self.baking_time} minutes."
 
-# Задание 2
-class UserAddressApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Адреса пользователей")
+# Builder: Интерфейс для создания частей пиццы
+class PizzaBuilder(ABC):
+    @abstractmethod
+    def add_ingredients(self):
+        pass
 
-        # Создание элементов интерфейса
-        self.user_listbox = tk.Listbox(root, selectmode=tk.SINGLE, width=40)
-        self.address_treeview = ttk.Treeview(
-            root, columns=("town", "street", "house"), show="headings"
-        )
-        self.init_button = tk.Button(
-            root, text="Инициализировать", command=self.initialize_data
-        )
-        self.reset_button = tk.Button(root, text="Сбросить", command=self.reset_data)
-        self.label = tk.Label(root, text="Выберите пользователя")
-        self.menu_bar = tk.Menu(root)
-        self.menu_file = tk.Menu(self.menu_bar, tearoff=0)
-        self.menu_file.add_command(
-            label="Инициализировать", command=self.initialize_data
-        )
-        self.menu_file.add_command(label="Сбросить", command=self.reset_data)
-        self.menu_bar.add_cascade(label="Опции", menu=self.menu_file)
-        self.root.config(menu=self.menu_bar)
-        self.check_button_var = tk.BooleanVar()
-        self.check_button = tk.Checkbutton(
-            root,
-            text="Дополнительный функционал",
-            variable=self.check_button_var,
-            command=self.additional_functionality,
-        )
+    @abstractmethod
+    def add_sauce(self):
+        pass
 
-        # Размещение элементов на форме
-        self.label.grid(row=0, column=0, columnspan=2, pady=5, sticky=tk.W)
-        self.user_listbox.grid(row=1, column=0, padx=5, pady=5)
-        self.address_treeview.grid(row=1, column=1, padx=5, pady=5)
-        self.init_button.grid(row=2, column=0, padx=5, pady=5)
-        self.reset_button.grid(row=2, column=1, padx=5, pady=5)
-        self.check_button.grid(row=3, column=0, columnspan=2, pady=5, sticky=tk.W)
+    @abstractmethod
+    def add_cheese(self):
+        pass
+    
+    @abstractmethod
+    def bake(self):
+        pass
+    
+    @abstractmethod
+    def get_pizza(self):
+        pass
 
-        # Настройка Listbox
+# Concrete Builder: Пицца Маргарита
+class MargheritaPizzaBuilder(PizzaBuilder):
+    def __init__(self):
+        self.pizza = Pizza()  # Новый объект пиццы
+    
+    def add_ingredients(self):
+        self.pizza.ingredients.append("tomato")  # Добавление помидоров
+        self.pizza.ingredients.append("basil")  # Добавление базилика
+    
+    def add_sauce(self):
+        self.pizza.sauce = "tomato"  # Добавление томатного соуса
+    
+    def add_cheese(self):
+        self.pizza.cheese = "mozzarella"  # Добавление моцареллы
+    
+    def bake(self):
+        self.pizza.baking_time = 10  # Время выпекания 10 минут
+    
+    def get_pizza(self):
+        return self.pizza  # Возвращение объекта пиццы
 
-        self.user_listbox.bind("<<ListboxSelect>>", self.on_user_select)
+# Concrete Builder: Гавайская пицца
+class HawaiianPizzaBuilder(PizzaBuilder):
+    def __init__(self):
+        self.pizza = Pizza()  # Новый объект пиццы
+    
+    def add_ingredients(self):
+        self.pizza.ingredients.append("ham")  # Добавление ветчины
+        self.pizza.ingredients.append("pineapple")  # Добавление ананасов
+    
+    def add_sauce(self):
+        self.pizza.sauce = "tomato"  # Добавление томатного соуса
+    
+    def add_cheese(self):
+        self.pizza.cheese = "cheddar"  # Добавление сыра чеддер
+    
+    def bake(self):
+        self.pizza.baking_time = 12  # Время выпекания 12 минут
+    
+    def get_pizza(self):
+        return self.pizza  # Возвращение объекта пиццы
 
-        # Настройка Treeview
-        self.address_treeview.heading("town", text="Город")
-        self.address_treeview.heading("street", text="Улица")
-        self.address_treeview.heading("house", text="Дом")
+# Concrete Builder: Пицца Пепперони
+class PepperoniPizzaBuilder(PizzaBuilder):
+    def __init__(self):
+        self.pizza = Pizza()  # Новый объект пиццы
+    
+    def add_ingredients(self):
+        self.pizza.ingredients.append("pepperoni")  # Добавление пепперони
+        self.pizza.ingredients.append("peppers")  # Добавление перца
+    
+    def add_sauce(self):
+        self.pizza.sauce = "tomato"  # Добавление томатного соуса
+    
+    def add_cheese(self):
+        self.pizza.cheese = "provolone"  # Добавление проволоне
+    
+    def bake(self):
+        self.pizza.baking_time = 15  # Время выпекания 15 минут
+    
+    def get_pizza(self):
+        return self.pizza  # Возвращение объекта пиццы
 
-        self.address_treeview.column("town", width=100, anchor=tk.CENTER)
-        self.address_treeview.column("street", width=150, anchor=tk.CENTER)
-        self.address_treeview.column("house", width=75, anchor=tk.CENTER)
+# Director: Управляет процессом приготовления пиццы
+class PizzaDirector:
+    def __init__(self, builder: PizzaBuilder):
+        self.builder = builder  # Установка билдера
 
-    def on_user_select(self, event):
-        selected_index = self.user_listbox.curselection()
-        if selected_index:
-            selected_index = selected_index[0]
-            selected_user = fio_list[selected_index]
-            self.populate_address_table(selected_user["Addresses"])
+    def construct_pizza(self):
+        self.builder.add_ingredients()  # Добавление ингредиентов
+        self.builder.add_sauce()  # Добавление соуса
+        self.builder.add_cheese()  # Добавление сыра
+        self.builder.bake()  # Выпекание
+        return self.builder.get_pizza()  # Возвращение готовой пиццы
 
-    def populate_address_table(self, addresses):
-        self.address_treeview.delete(*self.address_treeview.get_children())
-        for address in addresses:
-            self.address_treeview.insert(
-                "",
-                tk.END,
-                values=(address["town"], address["street"], address["house"]),
-            )
-
-    def initialize_data(self):
-        self.reset_data()
-        for user in fio_list:
-            self.user_listbox.insert(tk.END, user["FIO"])
-        self.user_listbox.selection_clear(0, tk.END)
-        self.user_listbox.selection_set(0)
-        self.on_user_select(None)
-
-    def reset_data(self):
-        self.user_listbox.delete(0, "end")
-        self.address_treeview.delete(*self.address_treeview.get_children())
-
-    def additional_functionality(self):
-        if self.check_button_var.get():
-            print("Дополнительный функционал активирован!")
-        else:
-            print("Дополнительный функционал деактивирован.")
-
-
+# Использование классов
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = UserAddressApp(root)
-    root.mainloop()
+    # Приготовление пиццы Маргарита
+    margherita_builder = MargheritaPizzaBuilder()
+    director = PizzaDirector(margherita_builder)
+    margherita_pizza = director.construct_pizza()
+    print(margherita_pizza)
 
-main()
-discard_buffers(DocTestFinder(verbose=False, parser=DocTestParser, ))
-SIG_DFL
- sdkfhsjdf
- sdfdsf
- 
- dsfdsf
- discard_buffers(D_FMT
-                 SMTPSenderRefused
-                 dsf)
+    # Приготовление Гавайской пиццы
+    hawaiian_builder = HawaiianPizzaBuilder()
+    director = PizzaDirector(hawaiian_builder)
+    hawaiian_pizza = director.construct_pizza()
+    print(hawaiian_pizza)
+
+    # Приготовление пиццы Пепперони
+    pepperoni_builder = PepperoniPizzaBuilder()
+    director = PizzaDirector(pepperoni_builder)
+    pepperoni_pizza = director.construct_pizza()
+    print(pepperoni_pizza)
